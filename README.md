@@ -15,6 +15,10 @@ Then, the centroid point is calculated, as well as the convex hull.
 
 Tangent line angles are calculated for a series of points along the convex hull, spaced equidistant from each other, with the total quantity being a power of 2 so that the data can be Fourier transformed. Finally, the cumulative angular function is calcuated and Fourier transformed.
 
-This makes our data invariant under rotation, translation, and scaling. Therefore, it does not matter where the character is drawn, how big/small it is drawn, or even if it is drawn upside down - the program should be able to recognize it (see Zhang, D., & Lu, G. (2003). A comparative study of curvature scale space and Fourier descriptors for shape-based image retrieval. Journal of Visual Communication and Image Representation, 14(1), 39–57. https://doi.org/10.1016/s1047-3203(03)00003-8).
+This makes our data invariant under rotation, translation, and scaling. Therefore, it does not matter where the character is drawn, how big/small it is drawn, or even if it is drawn upside down - the program should be able to recognize it (see 2).
 
 Finally, each drawn character is passed to memory along with a label, and subsequent characters are compared. Upon recollection, the program displays which character in memory is a closest match, along with its confidence.
+
+1) Arathorn, D., 2002. Map-seeking circuits in visual cognition. Stanford, Calif.: Stanford University Press.
+
+2) Zhang, D., & Lu, G., 2003. A comparative study of curvature scale space and Fourier descriptors for shape-based image retrieval. Journal of Visual Communication and Image Representation, 14(1), 39–57. https://doi.org/10.1016/s1047-3203(03)00003-8
