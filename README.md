@@ -13,7 +13,7 @@ Then, the centroid point is calculated, as well as the convex hull.
 
 ![image](https://user-images.githubusercontent.com/40635145/192383680-58e253ea-a1df-4f32-86a7-7b5cbeb32bbd.png)
 
-Tangent line angles are calculated for a series of points along the convex hull, spaced equidistant from each other, with the total quantity being a power of 2 so that the data can be Fourier transformed. Finally, the cumulative angular function is calcuated and Fourier transformed.
+Tangent line angles are calculated from the centroid point to a series of points along the convex hull, spaced equidistant from each other, with the total quantity being a power of 2 so that the data can be Fourier transformed. Finally, the cumulative angular function is calcuated and Fourier transformed.
 
 This makes our data invariant under rotation, translation, and scaling. Therefore, it does not matter where the character is drawn, how big/small it is drawn, or even if it is drawn upside down - the program should be able to recognize it (see 2).
 
