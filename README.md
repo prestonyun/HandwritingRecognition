@@ -19,6 +19,8 @@ This makes our data invariant under rotation, translation, and scaling. Therefor
 
 Each drawn character is passed to memory along with a label, and subsequent characters are compared. Upon recollection, the program displays which character in memory is a closest match, along with its confidence.
 
+### References
+
 1) Arathorn, D., 2002. Map-seeking circuits in visual cognition. Stanford, Calif.: Stanford University Press.
 
 2) Zhang, D., & Lu, G., 2003. A comparative study of curvature scale space and Fourier descriptors for shape-based image retrieval. Journal of Visual Communication and Image Representation, 14(1), 39–57. https://doi.org/10.1016/s1047-3203(03)00003-8
