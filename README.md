@@ -17,7 +17,7 @@ Tangent line angles are calculated from the centroid point to a series of points
 
 This makes our data invariant under rotation, translation, and scaling. Therefore, it does not matter where the character is drawn, how big/small it is drawn, or even if it is drawn upside down - the program should be able to recognize it (see 2).
 
-Finally, each drawn character is passed to memory along with a label, and subsequent characters are compared. Upon recollection, the program displays which character in memory is a closest match, along with its confidence.
+Each drawn character is passed to memory along with a label, and subsequent characters are compared. Upon recollection, the program displays which character in memory is a closest match, along with its confidence.
 
 1) Arathorn, D., 2002. Map-seeking circuits in visual cognition. Stanford, Calif.: Stanford University Press.
 
