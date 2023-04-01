@@ -3,34 +3,30 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Iterator;
-import java.util.Vector;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JComponent;
 
-public class dataProcessor extends JComponent {
+public class DataProcessor extends JComponent {
 
 	
 	private static final long serialVersionUID = 1L;
 	private Image container;
 	private Graphics2D canvas;
 	private int x, y, x0, y0;
-	Vector<Point> points = new Vector<Point>();
-	Vector<Double> xBound = new Vector<Double>();
-	Vector<Double> yBound = new Vector<Double>();
-	
-	Vector<Point> scaledPoints = new Vector<Point>();
-
-	Vector<Double> slopes = new Vector<Double>();
+	private List<Point> points = new ArrayList<Point>();
 	
 	public double[][] getDescriptors()
 	{
 		//Scale Points such that one point is stored every 3 pixels in "length"
-		scaledPoints = condense(points);
+		List<Point> scaledPoints = condense(points);
 		
 		//Ensures that the size of scaledPoints is a power of 2 for FFT
 		while ((scaledPoints.size() & (scaledPoints.size() - 1)) != 0)
@@ -58,10 +54,9 @@ public class dataProcessor extends JComponent {
 		for (int i = 0; i < pts.length; i++)
 		{
 			Point[] normPts = Arrays.copyOf(pts, pts.length);
-			normPts[i].x = pts[i].x * norm;
-			normPts[i].y = pts[i].y * norm;
-			
-			//double[] tan = tangent(pts[i], cent);
+			normPts[i].setXVal(pts[i].getXVal() * norm);
+			normPts[i].setYVal(pts[i].getYVal() * norm);
+
 			double[] normTan = tangent(normPts[i], normCent);
 			
 			double difference = ((theta((normTan)) - theta0)%(2*Math.PI)) - i;
@@ -73,31 +68,17 @@ public class dataProcessor extends JComponent {
 	}
 	
 	//Scales data points such that the "line density" is consistent: drawing faster/slower produces same result
-	public Vector<Point> condense(Vector<Point> input)
-	{
-		int a = 0, b = a + 1;
-		Vector<Point> normalized = new Vector<Point>();
-		
-		Iterator<Point> it = input.iterator();
+	public List<Point> condense(List<Point> input) {
+		List<Point> normalized = new ArrayList<Point>();
+		normalized.add(input.get(0));
 
-		while (it.hasNext() && a < input.size())
-		{
-			int test = 0;
-			Point tmp = input.get(a);
-			Point tmp2 = it.next();
-			
-			test += findLength(tmp, tmp2);
-			
-			if (test % 2 == 0)
-			{
-				normalized.add(tmp2);
-
-				a = b;
+		for (int i = 1; i < input.size(); i++) {
+			Point tmp = input.get(i);
+			if (findLength(normalized.get(normalized.size() - 1), tmp) > 3) {
+				normalized.add(tmp);
 			}
-			
-			it.remove();
 		}
-		
+
 		return normalized;
 	}
 	
@@ -113,9 +94,9 @@ public class dataProcessor extends JComponent {
 	//Then, since tangent lines are normal to to the radial line, we use the
 	//centroid to find a tangential line at each point.
 	
-	public double[] centroid(Vector<Point> points)
+	public double[] centroid(List<Point> points)
 	{
-		Vector<Point> pts = getBoundary(points);
+		List<Point> pts = getBoundary(points);
 			
 		int xC = 0, yC = 0;
 		Iterator<Point> it = pts.iterator();
@@ -140,33 +121,25 @@ public class dataProcessor extends JComponent {
 	
 	//Given a point and an origin point, finds a vector that points from the origin to given point, then rotates 90 degrees
 	//to obtain a tangent vector
-	public double[] tangent(Point a, double[] centroid)
-	{
+	public double[] tangent(Point a, double[] centroid) {
 		double dX, dY;
-		
-		if (a.getYVal() > centroid[1])
-			dY = centroid[1] - a.getYVal();
-		else
-			dY = a.getYVal() - centroid[1];
-		
-		if (a.getXVal() > centroid[0])
-			dX = a.getXVal() - centroid[0];
-		else
-			dX = centroid[0] - a.getXVal();
-		
-		double[] result = {-dY, dX};
-		
+
+		dY = centroid[1] - a.getYVal();
+		dX = a.getXVal() - centroid[0];
+
+		double[] result = { -dY, dX };
+
 		return result;
 	}
 	
 	public double theta(double[] tanVec)
 	{
-		double angle = Math.atan(tanVec[1] / tanVec[0]);
+		double angle = Math.atan2(tanVec[1], tanVec[0]);
 		
 		return angle;
 	}
 
-	public dataProcessor()
+	public DataProcessor()
 	{
 		setDoubleBuffered(false);
 		addMouseListener(new MouseAdapter()
@@ -220,11 +193,11 @@ public class dataProcessor extends JComponent {
 	}
 	
 	//Creates 2D double array to contain Fourier Transformed data
-	public Vector<Point> getBoundary(Vector<Point> points)
+	public List<Point> getBoundary(List<Point> points)
 	{	
-		Vector<Point> result = new Vector<Point>();
+		List<Point> result = new ArrayList<Point>();
 		//Sort points
-		points.sort(new compareValues());
+		Collections.sort(points, new compareValues());
 		
 		//Instantiates Point array
 		Point[] r = new Point[points.size()];
@@ -232,14 +205,13 @@ public class dataProcessor extends JComponent {
 		//Populates Points array
 		for (int i = 0; i < points.size(); i++)
 		{
-			r[i] = points.elementAt(i);
+			r[i] = points.get(i);
 		}
 		
 		//Takes convex hull of Point array
 		Point[] ri = convex_hull(r);
 		
-		for (int i = 0; i < ri.length; i++)
-			result.add(ri[i]);
+		result.addAll(Arrays.asList(ri));
 		
 		return result;
 	}
@@ -248,9 +220,7 @@ public class dataProcessor extends JComponent {
 	public void clear()
 	{			
 		points.clear();
-		brain.input.setText("");
 		canvas.setColor(Color.white);
-			
 		canvas.fillRect(0,  0,  getSize().width, getSize().height);
 		canvas.setColor(Color.black);
 		repaint();
@@ -261,10 +231,10 @@ public class dataProcessor extends JComponent {
 	{
 		public int compare(Point a, Point b)
 		{
-			if (a.x == b.x)
-				return (int) (a.y - b.y); 
+			if (a.getXVal() == b.getXVal())
+				return (int) (a.getYVal() - b.getYVal());
 			else
-				return (int) (a.x - b.x);
+				return (int) (a.getXVal() - b.getXVal());
 		}
 	}
 		
@@ -279,7 +249,6 @@ public class dataProcessor extends JComponent {
 		
 			int n = P.length, k = 0;
 			Point[] H = new Point[2 * n];
-			Vector<Point> Hi = new Vector<Point>();
 
 			// Build lower hull
 			for (int i = 0; i < n; ++i) {
@@ -300,19 +269,7 @@ public class dataProcessor extends JComponent {
 				H = Arrays.copyOfRange(H, 0, k - 1); // remove non-hull vertices after k; remove k - 1 which is a duplicate
 			}
 			
-			for (int i = 0; i < H.length; i++)
-			{
-				Hi.add(H[i]);
-			}
-			
-			
-			Point[] result = new Point[Hi.size()];
-			for (int i = 0; i < Hi.size(); i++)
-			{
-				result[i] = Hi.elementAt(i);
-			}
-		
-			return result;
+		return H;
 	}
 	
 }
@@ -331,22 +288,6 @@ public class dataProcessor extends JComponent {
 		{
 			this.x = x;
 			this.y = y;
-		}
-		
-		public Point isPoint(double x)
-		{
-			if (this.x == x)
-				return this;
-			else
-				return null;
-		}
-		
-		public boolean equals(Point o)
-		{
-			if (this.getXVal() == o.getXVal() && this.getYVal() == o.getYVal())
-				return true;
-			else
-				return false;
 		}
 		
 		public double getXVal()

@@ -1,39 +1,36 @@
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 
-public class circuit {
+public class Circuit {
 	
-	public double[] forwardBias, g;
-	public static double threshold = 0.3;
-	public static Vector<memory> mem = new Vector<memory>();
-	public Vector<Double> q = new Vector<Double>();
+	private double[] forwardBias, g;
+	private static double threshold = 0.3;
+	private static List<memory> mem = new ArrayList<memory>();
+	private List<Double> q = new ArrayList<Double>();
 	
-	final int a = 16;
+	private final int a = 16;
 	
-	public circuit(double[][] data, String c)
+	public Circuit(double[][] data, String label)
 	{
 		FastFourierTransformer.transformInPlace(data, DftNormalization.UNITARY, TransformType.FORWARD);
 		
-		this.g = new double[a];
+		g = new double[a];
+		forwardBias = new double[a];
 		for (int i = 0; i < a; i++)
 		{
-			this.g[i] = 1;
+			g[i] = 1;
+			forwardBias[i] = g[i] * data[0][i];
 		}
 		
-		this.forwardBias = new double[a];
-		for (int i = 0; i < a; i++)
-		{
-			this.forwardBias[i] = g[i] * data[0][i];
-		}
-		
-		store(forwardBias, c);
+		store(forwardBias, label);
 	}
 	
-	public circuit(double[][] data)
+	public Circuit(double[][] data)
 	{
 		this(data, null);
 	}
@@ -58,7 +55,7 @@ public class circuit {
 		//return forwardBias;
 	}
 	
-	public String recall(circuit unit)
+	public String recall(Circuit unit)
 	{
 		Iterator<memory> it = mem.iterator();
 
@@ -111,16 +108,6 @@ public class circuit {
 		
 		mem.add(m);
 	}
-	
-	public void showData()
-	{
-		Iterator<memory> it = mem.iterator();
-		while (it.hasNext())
-		{
-			System.out.println(it.next().getLabel());
-		}
-	}
-	
 	
 	private class memory
 	{
